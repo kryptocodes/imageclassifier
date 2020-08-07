@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useReducer } from "react";
+import React, { useState, useRef, useReducer } from "react";
 import * as mobilenet from "@tensorflow-models/mobilenet";
 
 const machine = {
@@ -19,10 +19,7 @@ const App = () => {
   const [model, setModel] = useState(null);
   const imageRef = useRef();
   const inputRef = useRef();
-
-  useEffect(() => {
-    loadModel()
-  }, [])
+  
 
   const reducer = (state, event) =>
     machine.states[state].on[event] || machine.initial;
