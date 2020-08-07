@@ -1,11 +1,11 @@
-import React, { useState, useRef, useReducer } from "react";
+import React, { useState, useRef, useEffect, useReducer } from "react";
 import * as mobilenet from "@tensorflow-models/mobilenet";
 
 const machine = {
   initial: "initial",
   states: {
     initial: { on: { next: "loadingModel" } },
-    loadingModel: { on: { next: "modelReady" } },
+    loadingModel: { on: { next: "modelReady" }, showText: true },
     modelReady: { on: { next: "imageReady" } },
     imageReady: { on: { next: "identifying" }, showImage: true },
     identifying: { on: { next: "complete" } },
@@ -19,6 +19,10 @@ const App = () => {
   const [model, setModel] = useState(null);
   const imageRef = useRef();
   const inputRef = useRef();
+
+  useEffect(() => {
+    loadModel()
+  }, [])
 
   const reducer = (state, event) =>
     machine.states[state].on[event] || machine.initial;
@@ -65,11 +69,11 @@ const App = () => {
     complete: { action: reset, text: "Reset" }
   };
 
-  const { showImage, showResults } = machine.states[appState];
+  const { showImage, showResults, showText } = machine.states[appState];
 
   return (
-    <div className="container mt-5">
-      <h1 className="display-4 mt-5 pt-5">Image Classifier</h1>
+    <div className="container">
+      <h1 className="display-4">Image Classifier</h1>
       {showImage && <img src={imageURL} alt="upload-preview" ref={imageRef} />}
       <input
         type="file"
@@ -85,9 +89,10 @@ const App = () => {
           ))}
         </ul>
       )}
-      <button className="btn btn-outline-warning" onClick={actionButton[appState].action || (() => {})}>
+      <button className="btn btn-lg btn-outline-warning justify-content-center mt-5" onClick={actionButton[appState].action || (() => {})}>
         {actionButton[appState].text}
       </button>
+      { showText && <div>Loading ML models please wait</div> }
     </div>
   );
 }
